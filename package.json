@@ -9,6 +9,7 @@
     "seed": "nodemon ./src/scripts/marvel-seed.js"
   },
   "dependencies": {
+    "express": "^4.17.1",
     "marvel-api": "^1.1.0",
     "mysql2": "^2.1.0",
     "sequelize": "^5.21.3"

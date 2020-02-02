@@ -2,12 +2,12 @@ const express = require('express')
 
 const router = express.Router()
 
-// const characters = require('../controllers/http/characters')
+const characters = require('../controllers/http/characters')
 
-// router.get('/', documents.index)
-// router.get('/:id', documents.show)
-// router.post('/', documents.store)
-// router.put('/:id', documents.update)
-// router.delete('/', documents.destroy)
+router.get('/', characters.index)
+// router.get('/:id', characters.show)
+// router.post('/', characters.store)
+// router.put('/:id', characters.update)
+// router.delete('/', characters.destroy)
 
 module.exports = router
