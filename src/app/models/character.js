@@ -7,13 +7,14 @@ module.exports = (sequelize, DataTypes) => {
       thumbnail: DataTypes.STRING,
       description: DataTypes.TEXT
     },
-    {}
+    {
+      tableName: "Characters"
+    }
   );
+
   Character.associate = function(models) {
     Character.belongsToMany(models.Comic, {
-      through: models.CharacterComics,
-      // as: "comics",
-      // foreignKey: "character_id"
+      through: models.CharacterComics
     });
   };
   return Character;
