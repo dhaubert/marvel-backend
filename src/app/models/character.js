@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     {}
   );
   Character.associate = function(models) {
-    Character.belogsToMany(models.Comic, {
+    Character.belongsToMany(models.Comic, {
       through: models.CharacterComics,
       // as: "comics",
       // foreignKey: "character_id"
