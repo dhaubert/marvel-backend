@@ -17,7 +17,7 @@ Use docker-compose to run both database and the API
 
 `docker-compose up --build`
 
-To install docker-compose, check this article (installing docker-compose Linux)[https://linuxize.com/post/how-to-install-and-use-docker-compose-on-ubuntu-18-04/]
+To install docker-compose, check this article [installing docker-compose Linux](https://linuxize.com/post/how-to-install-and-use-docker-compose-on-ubuntu-18-04/)
 
 ### Run script to download all data from Marvel API and 
 
