@@ -24,7 +24,12 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    {}
+    {
+      tableName: "CharacterComics",
+      underscored: true,
+      underscoredAll: true,
+      timestamps: false
+    }
   );
   return CharacterComics;
 };

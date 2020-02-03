@@ -1,20 +1,27 @@
 const { Sequelize } = require("sequelize");
-const { Character } = require("../../models");
+const { Character, Comic } = require("../../models");
 
 class CharacterController {
   constructor() {
-      
-      this.model = Character;
+    this.model = Character;
   }
-  async index({ req, res }) {
-      const result = await Character.findAll();
-      res.send(JSON.stringify(result, null, 2));
+  async index(request, response) {
+    try {
+      const result = await Character.findAll({
+        attributes: ['id', 'name', 'description', 'thumbnail'],
+        include: {
+          model: Comic,
+          through: {attributes: []}
+        }
+      });
+      response.json(result);
+    } catch (error) {
+      response.status(400).json({ error: true, errorMessage: error.message });
+    }
   }
 
-  show({ id }) {
-  }
+  show({ req, res }) {}
 }
 
-
-const character = new CharacterController()
+const character = new CharacterController();
 module.exports = character;

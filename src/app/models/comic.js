@@ -10,7 +10,9 @@ module.exports = (sequelize, DataTypes) => {
       page_count: DataTypes.INTEGER
     },
     {
-      tableName: "Characters"
+      tableName: "Comics",
+      underscored: true,
+      underscoredAll: true
     }
   );
   Comic.associate = function(models) {

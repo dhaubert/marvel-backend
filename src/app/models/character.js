@@ -8,7 +8,9 @@ module.exports = (sequelize, DataTypes) => {
       description: DataTypes.TEXT
     },
     {
-      tableName: "Characters"
+      tableName: "Characters",
+      underscored: true,
+      underscoredAll: true
     }
   );
 

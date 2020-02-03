@@ -3,14 +3,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable("CharacterComics", {
-      create_at: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updated_at: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
       character_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
