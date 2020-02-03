@@ -18,8 +18,6 @@ module.exports = (sequelize, DataTypes) => {
   Comic.associate = function(models) {
     Comic.belongsToMany(models.Character, {
       through: models.CharacterComics
-      // as: "characters",
-      // foreignKey: "comic_id"
     });
   };
   return Comic;

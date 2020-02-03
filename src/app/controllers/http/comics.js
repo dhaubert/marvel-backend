@@ -3,18 +3,25 @@ const { Character, Comic } = require("../../models");
 
 class CharacterController {
   constructor() {
-    this.model = Character;
+    this.model = Comic;
   }
   async index(request, response) {
     try {
-      const result = await Character.findAll({
-        attributes: ['id', 'name', 'description', 'thumbnail'],
+      const result = await Comic.findAll({
+        attributes: [
+          "id",
+          "title",
+          "description",
+          "variant_description",
+          "page_count",
+          "thumbnail"
+        ],
         include: {
-          model: Comic,
-          through: {attributes: []}
+          model: Character,
+          through: { attributes: [] }
         }
       });
-      response.json(result);
+      return response.json(result);
     } catch (error) {
       response.status(400).json({ error: true, errorMessage: error.message });
     }
@@ -23,9 +30,9 @@ class CharacterController {
   async show(request, response) {
     try {
       const { id } = request.params;
-      const result = await Character.findByPk(id);
+      const result = await Comic.findByPk(id);
       if (!result) {
-          throw { errorCode: 404, message: `Character ${id} not found`, error: true};
+          throw { errorCode: 404, message: `Comic ${id} not found`, error: true};
       }
       response.json(result);
     } catch (error) {
