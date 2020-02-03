@@ -6,7 +6,7 @@ const { Character: CharacterModel, Comic: ComicModel } = require("../models");
 
 class MarvelSeed {
   constructor() {
-    this.downloadInterval = 1;
+    this.downloadInterval = 30;
     if (!environment.loadEnv({ checkVariable: "MARVEL_API_PUBLIC_KEY" })) {
       return;
     }
@@ -16,7 +16,7 @@ class MarvelSeed {
       privateKey: process.env.MARVEL_API_PRIVATE_KEY
     });
   }
-  
+
   /**
    * Main method, runs the script.
    */
@@ -83,7 +83,6 @@ class MarvelSeed {
         this.storeCharacters(charactersFormattedData);
 
         resourceLength = meta.total;
-        resourceLength = 2;
         page++;
       } while (fromIndex < resourceLength);
     } catch (error) {
