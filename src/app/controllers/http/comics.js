@@ -6,6 +6,7 @@ class CharacterController {
   }
   async index(request, response) {
     try {
+      const { offset, limit } = request.params;
       const result = await Comic.findAll({
         attributes: [
           "id",
@@ -18,7 +19,11 @@ class CharacterController {
         include: {
           model: Character,
           through: { attributes: [] }
-        }
+        },
+        offset,
+        limit,
+        subQuery: false,
+        order: ["title"]
       });
       return response.json(result);
     } catch (error) {
@@ -31,13 +36,17 @@ class CharacterController {
       const { id } = request.params;
       const result = await Comic.findByPk(id);
       if (!result) {
-          throw { errorCode: 404, message: `Comic ${id} not found`, error: true};
+        throw { errorCode: 404, message: `Comic ${id} not found`, error: true };
       }
       response.json(result);
     } catch (error) {
       return response
         .status(error.errorCode)
-        .json({ error: true, errorCode: error.errorCode, errorMessage: error.message });
+        .json({
+          error: true,
+          errorCode: error.errorCode,
+          errorMessage: error.message
+        });
     }
   }
 }

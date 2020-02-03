@@ -1,13 +1,14 @@
-const express = require('express')
+const express = require("express");
 
-const router = express.Router()
+const router = express.Router();
 
-const characters = require('../controllers/http/characters')
+const characters = require("../controllers/http/characters");
+const pagination = require("../middlewares/pagination");
 
-router.get('/', characters.index)
-router.get('/:id', characters.show)
+router.get("/", pagination, characters.index);
+router.get("/:id", characters.show);
 // router.post('/', characters.store)
 // router.put('/:id', characters.update)
 // router.delete('/', characters.destroy)
 
-module.exports = router
+module.exports = router;

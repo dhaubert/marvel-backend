@@ -6,12 +6,18 @@ class CharacterController {
   }
   async index(request, response) {
     try {
+      const { offset, limit } = request.params;
+      
       const result = await Character.findAll({
         attributes: ['id', 'name', 'description', 'thumbnail'],
         include: {
           model: Comic,
           through: {attributes: []}
-        }
+        },
+        offset,
+        limit,
+        subQuery: false,
+        order: ["name"]
       });
       response.json(result);
     } catch (error) {
