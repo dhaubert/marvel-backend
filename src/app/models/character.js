@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
 
   Character.associate = function(models) {
     Character.belongsToMany(models.Comic, {
-      through: models.CharacterComics
+      through: models.CharacterComics,
+      foreignKey: 'character_id'
     });
   };
   return Character;
