@@ -10,7 +10,7 @@ class MarvelSeed {
     if (!environment.loadEnv({ checkVariable: "MARVEL_API_PUBLIC_KEY" })) {
       return;
     }
-    log(`Running on ${process.env.NODE_ENV} environment:`);
+    log(`Running on ${process.env.NODE_ENV} environment.`);
     this.marvel = marvelApi.createClient({
       publicKey: process.env.MARVEL_API_PUBLIC_KEY,
       privateKey: process.env.MARVEL_API_PRIVATE_KEY
