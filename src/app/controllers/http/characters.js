@@ -58,15 +58,6 @@ class CharacterController {
           through: { attributes: [] }
         }
       });
-      const noComicsFound =
-        !result || !result.Comics || result.Comics.length === 0;
-      if (noComicsFound) {
-        throw {
-          errorCode: 404,
-          message: `No comics found for ${id}`,
-          error: true
-        };
-      }
       response.json(result.Comics);
     } catch (error) {
       return response.status(error.errorCode || 400).json({
