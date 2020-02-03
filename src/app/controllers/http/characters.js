@@ -1,4 +1,3 @@
-const { Sequelize } = require("sequelize");
 const { Character, Comic } = require("../../models");
 
 class CharacterController {
