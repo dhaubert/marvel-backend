@@ -12,10 +12,6 @@ class CharacterController {
 
       const result = await Character.findAll({
         attributes: ["id", "name", "description", "thumbnail"],
-        include: {
-          model: Comic,
-          through: { attributes: [] }
-        },
         where: {
           name: {
             [Sequelize.Op.like]: '%'+ search +'%'
