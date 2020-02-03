@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon ./src/server.js",
     "start": "node ./src/server.js",
-    "seed": "nodemon ./src/scripts/marvel-seed.js"
+    "seed": "node ./src/app/scripts/marvel-api-seed.js"
   },
   "dependencies": {
     "express": "^4.17.1",
