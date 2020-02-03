@@ -1,8 +1,8 @@
 module.exports = {
   development: {
     username: "root",
-    password: "",
-    database: "marvel",
+    password: process.env.MYSQL_ROOT_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
     host: "127.0.0.1",
     dialect: "mysql",
     define: {
@@ -10,12 +10,11 @@ module.exports = {
       underscored: true,
       underscoredAll: true
     },
-    logging: console.log
   },
   test: {
     username: "root",
     password: null,
-    database: "database_test",
+    database: "marvel",
     host: "127.0.0.1",
     dialect: "mysql",
     define: {
@@ -27,7 +26,7 @@ module.exports = {
   production: {
     username: "root",
     password: null,
-    database: "database_production",
+    database: "marvel",
     host: "127.0.0.1",
     dialect: "mysql",
     define: {
