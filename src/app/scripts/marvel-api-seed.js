@@ -6,7 +6,7 @@ const { Character: CharacterModel, Comic: ComicModel } = require("../models");
 
 class MarvelSeed {
   constructor() {
-    this.downloadInterval = 20;
+    this.downloadInterval = 1;
     if (!environment.loadEnv({ checkVariable: "MARVEL_API_PUBLIC_KEY" })) {
       return;
     }
@@ -16,7 +16,133 @@ class MarvelSeed {
       privateKey: process.env.MARVEL_API_PRIVATE_KEY
     });
   }
+  
+  /**
+   * Main method, runs the script.
+   */
+  async run() {
+    try {
+      this.downloadCharacters(this.marvel.characters);
+    } catch (error) {
+      log("ERROR:", error);
+    }
+  }
 
+  /**
+   * Store the information about characters and its comics
+   * @param {Array} characterData Array with characters information
+   */
+  async storeCharacters(characterData) {
+    for (let i = 0; i < characterData.length; i++) {
+      let eachCharacter = characterData[i];
+      log(`Saving character: ${eachCharacter.name}. He is part of ${eachCharacter.Comics.length} comics.`);
+      this.storeCharacter(eachCharacter);
+    }
+  }
+  /**
+   * Store information of a single character and several associations with Comics
+   * @param {Object} eachCharacter Each character information (name, description, thumbnail, id)
+   */
+  async storeCharacter(eachCharacter) {
+    
+    try {
+      return await CharacterModel.create(eachCharacter, {
+        include: [ComicModel],
+        ignoreDuplicates: true
+      });
+    } catch (error) {
+      if (error.name !== "SequelizeUniqueConstraintError") {
+        log("Creation error:", error);
+      }
+    }
+  }
+  /**
+   * Consumes data from Marvel's API and stores in a local database
+   * @param {Object} marvelResource Object resouce of marvel's API. i.e. this.marvel.characters
+   */
+  async downloadCharacters(marvelResource) {
+    try {
+      let page = 0;
+      let fromIndex = 0;
+      let resourceLength = 0;
+      const pageLength = this.downloadInterval;
+
+      do {
+        fromIndex = page * this.downloadInterval;
+        const { data: characterData, meta } = await marvelResource.findAll(
+          pageLength,
+          fromIndex
+        );
+
+        this.logProgress(meta);
+
+        const charactersFormattedData = await this.fetchComicsAndFormat(
+          characterData
+        );
+
+        this.storeCharacters(charactersFormattedData);
+
+        resourceLength = meta.total;
+        resourceLength = 2;
+        page++;
+      } while (fromIndex < resourceLength);
+    } catch (error) {
+      log("ERROR:", error);
+    }
+  }
+  /**
+   * Fetches the comics that a given character was mentioned at
+   * @param {Object} { id } Identifier of the character
+   */
+  async fetchComicsFromCharacter({ id }) {
+    return await this.marvel.characters.comics(id);
+  }
+  /**
+   * Fetches comic data and format the character with it.
+   * @param {Array} characterData Data from marvel.characters.findAll
+   */
+  async fetchComicsAndFormat(characterData) {
+    let charactersFormattedData = [];
+    for (let i = 0; i < characterData.length; i++) {
+      let characterObject = characterData[i];
+
+      const { data: comicsData } = await this.fetchComicsFromCharacter(
+        characterObject
+      );
+
+      const association = this.associationFormat(characterObject, comicsData);
+      charactersFormattedData.push(association);
+    }
+    return charactersFormattedData;
+  }
+
+  /**
+   * Logs the percentage and how much of total was already processed
+   * @param {Object} {offset, total}
+   */
+  async logProgress({ offset, total }) {
+    const percentage = Math.floor((offset * 100) / total);
+    log(`${percentage}% - ${offset}/${total} remaining.`);
+    return percentage;
+  }
+
+  /**
+   * Formats for database creation
+   * @param {Object} characterObject  Character information (1)
+   * @param {Array} comicsData Comic's data array (1+)
+   */
+  associationFormat(characterObject, comicsData) {
+    return {
+      ...this.characterFormat(characterObject),
+      Comics: comicsData.map(this.comicFormat)
+    };
+  }
+
+  /**
+   * Formats the object to be according the model
+   * @param {Object} requestObject Object that comes from the Marvel API request
+   * @returns {Object} Formatted object
+   */
   comicFormat(requestObject) {
     return {
       id: requestObject.id,
@@ -28,7 +154,11 @@ class MarvelSeed {
         requestObject.thumbnail.path + "." + requestObject.thumbnail.extension
     };
   }
-
+  /**
+   * Formats the object to be according the model
+   * @param {Object} requestObject Object that comes from the Marvel API request
+   * @returns {Object} Formatted object
+   */
   characterFormat(requestObject) {
     return {
       id: requestObject.id,
@@ -37,131 +167,6 @@ class MarvelSeed {
       thumbnail:
         requestObject.thumbnail.path + "." + requestObject.thumbnail.extension
     };
-  }
-
-  loadEnv() {
-    require("dotenv").config();
-    if (!process.env.MARVEL_API_PUBLIC_KEY) {
-      log("Please, check app environment variables (.env)");
-      return;
-    }
-    log(`Running on ${process.env.NODE_ENV} environment:`);
-    return true;
-  }
-
-  async run() {
-    try {
-      this.fetchCharacters();
-    } catch (error) {
-      console.log("ERROR:", error);
-    }
-  }
-
-  async fetchCharacters() {
-    return this.fetchResource(this.marvel.characters);
-  }
-
-  async fetchComicsFromCharacter({ id }) {
-    return await this.marvel.characters.comics(id);
-  }
-
-  async storeCharacters(characterData) {
-    let result = [];
-
-    try {
-      for (let i = 0; i < characterData.length; i++) {
-        let eachCharacter = characterData[i];
-        log(
-          "saving:" +
-            eachCharacter.name +
-            " comics: " +
-            eachCharacter.Comics.length
-        );
-        console.log(eachCharacter.Comics);
-        result.push(
-          await CharacterModel.create(eachCharacter, {
-            include: [ComicModel],
-            ignoreDuplicates: true
-          })
-        );
-        console.log("result:", result);
-      }
-    } catch (error) {
-      if (error.name !== "SequelizeUniqueConstraintError") {
-        console.log("Creation error:", error, characterData);
-      }
-    }
-    return result;
-  }
-
-  async fetchResource(marvelResource) {
-    try {
-      let page = 0;
-      let fromIndex = 0;
-      let resourceLength = 0;
-      const pageLength = this.downloadInterval;
-      do {
-        fromIndex = page * this.downloadInterval;
-        const { data, meta } = await marvelResource.findAll(
-          pageLength,
-          fromIndex
-        );
-        resourceLength = meta.total;
-        const percentage = Math.floor((meta.offset * 100) / meta.total);
-        log(`${percentage}% - ${meta.offset}/${meta.total} remaining.`);
-
-        // const characterComicsDataPromises = data.map(async characterObject => {
-        //   const {
-        //     data: comicsData,
-        //     meta
-        //   } = await this.fetchComicsFromCharacter(characterObject);
-        //   const characterComicsPromises = comicsData.map(async comicData => {
-        //     return this.comicFormat(comicData);
-        //   });
-
-        //   const characterComics = await Promise.all(characterComicsPromises);
-        //   return {
-        //     ...this.characterFormat(characterObject),
-        //     Comics: characterComics
-        //   };
-        // });
-        let charactersFormattedData = [];
-        for (let i = 0; i < data.length; i++) {
-          let characterObject = data[i];
-
-          const { data: comicsData } = await this.fetchComicsFromCharacter(
-            characterObject
-          );
-          // for (let j = 0; j < comicsData.length; j++) {
-          //   const comicData = comicsData[j];
-
-          // }
-          // const comicsDataFormatted =
-          charactersFormattedData.push({
-            ...this.characterFormat(characterObject),
-            Comics: comicsData.map(this.comicFormat),
-            CharacterComics: comicsData.map(comic => {
-              return {
-                character_id: characterObject.id,
-                comic_id: comic.id
-              };
-            })
-          });
-        }
-
-        // const characterComicsData = await Promise.all(
-        //   characterComicsDataPromises
-        // );
-        this.storeCharacters(charactersFormattedData);
-        //   data.map(({ name, description, thumbnail, id, comics }) => {
-        //     // console.log("CharacterModel:", name, description, thumbnail, id);
-        //     // console.log("CharacterModel:", comics.collectionURI);
-        //   });
-        page++;
-      } while (fromIndex < resourceLength);
-    } catch (error) {
-      console.log("ERROR:", error);
-    }
   }
 }
 
