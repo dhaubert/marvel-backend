@@ -7,6 +7,7 @@ const pagination = require("../middlewares/pagination");
 
 router.get("/", pagination, characters.index);
 router.get("/:id", characters.show);
+router.get("/:id/comics", characters.comics);
 // router.post('/', characters.store)
 // router.put('/:id', characters.update)
 // router.delete('/', characters.destroy)

@@ -39,6 +39,27 @@ class CharacterController {
         .json({ error: true, errorCode: error.errorCode, errorMessage: error.message });
     }
   }
+
+  async comics(request, response) {
+    try {
+      const { id } = request.params;
+      const result = await Character.findByPk(id, {
+        include: {
+          model: Comic,
+          through: {attributes: []}
+        }
+      });
+      const noComicsFound = !result || !result.Comics || result.Comics.length === 0;
+      if (noComicsFound) {
+          throw { errorCode: 404, message: `No comics found for ${id}`, error: true};
+      }
+      response.json(result.Comics);
+    } catch (error) {
+      return response
+        .status(error.errorCode || 400)
+        .json({ error: true, errorCode: error.errorCode, errorMessage: error.message });
+    }
+  }
 }
 
 const character = new CharacterController();
