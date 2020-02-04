@@ -12,5 +12,11 @@ COPY . .
 
 EXPOSE 8600
 
+CMD ["npx", "sequelize", "db:create"]
+
+CMD ["npx", "sequelize", "db:migrate"]
+
+CMD ["npm", "run", "seed"]
+
 CMD ["npm", "start"]
 

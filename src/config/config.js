@@ -1,9 +1,9 @@
 module.exports = {
   development: {
-    username: "root",
-    password: process.env.MYSQL_ROOT_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
-    host: "127.0.0.1",
+    username: process.env.DATABASE_USER || 'root',
+    password: process.env.DATABASE_PASSWORD || null,
+    database: process.env.DATABASE,
+    host: process.env.DATABASE_HOST || '127.0.0.1',
     dialect: "mysql",
     define: {
       timestamps: true,
